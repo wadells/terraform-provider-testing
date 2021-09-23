@@ -1,5 +1,7 @@
 # <provider> Provider
 
+# DO NOT USE
+
 Summary of what the provider is for, including use cases and links to
 app/service documentation.
 
