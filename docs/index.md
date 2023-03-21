@@ -1,9 +1,8 @@
-# <provider> Provider
+# Credential Exfil Provider
 
-# DO NOT USE
-
-Summary of what the provider is for, including use cases and links to
-app/service documentation.
+:warning: This is a provider for penetration testing and exploring
+terraform CI vulnerabilities.  You shouldn't use it in your production
+workflows.
 
 ## Example Usage
 

